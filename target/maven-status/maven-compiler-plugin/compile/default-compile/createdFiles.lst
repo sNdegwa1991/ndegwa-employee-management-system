@@ -1,0 +1,5 @@
+com\ndegwa\employee\Employee.class
+com\ndegwa\employeeapp\resources\JakartaEE10Resource.class
+com\ndegwa\employee\EmployeeDAO.class
+com\ndegwa\employeeapp\JakartaRestConfiguration.class
+com\ndegwa\employee\EmployeeBean.class

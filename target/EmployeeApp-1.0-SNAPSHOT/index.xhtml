@@ -1,0 +1,257 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="jakarta.faces.html"
+      xmlns:f="jakarta.faces.core"
+      xmlns:p="http://primefaces.org/ui">
+    
+    <h:head>
+        <title>Employee Management System</title>
+        <style type="text/css">
+            .ui-datatable .ui-datatable-header {
+                text-align: right !important;
+            }
+            .column-center {
+                text-align: center;
+            }
+            .column-right {
+                text-align: right;
+            }
+            .dialog-width {
+                width: 500px;
+            }
+            .button-margin {
+                margin-right: 5px;
+            }
+            .dialog-footer {
+                text-align: right;
+                border-top: 1px solid #e0e0e0;
+                margin-top: 15px;
+                padding-top: 10px;
+            }
+            .dialog-footer .ui-button {
+                margin-left: 8px;
+            }
+            /* Button styles */
+            .ui-button-success {
+                background-color: #4CAF50 !important;
+                color: white !important;
+            }
+            .ui-button-danger {
+                background-color: #f44336 !important;
+                color: white !important;
+            }
+            .ui-button-secondary {
+                background-color: #9E9E9E !important;
+                color: white !important;
+            }
+        </style>
+        
+        <script type="text/javascript">
+           
+            function ensureDialogButtonsVisible() {
+                setTimeout(function() {
+                    $('.dialog-footer').css({
+                        'display': 'block',
+                        'margin-top': '10px',
+                        'padding-top': '10px',
+                        'border-top': '1px solid #e0e0e0',
+                        'text-align': 'right'
+                    });
+                    
+                    $('.dialog-footer .ui-button').css({
+                        'display': 'inline-block',
+                        'margin-left': '8px',
+                        'min-width': '100px'
+                    });
+                }, 100);
+            }
+            
+            $(document).ready(function() {
+                $(document).on('pfAjaxComplete', function() {
+                    ensureDialogButtonsVisible();
+                });
+            });
+        </script>
+    </h:head>
+    
+    <h:body>
+        <p:growl id="messages" showDetail="true" />
+        
+        <div class="card">
+            <h:form id="employeeForm">
+                <p:panel header="Employee Management System">
+                    <p:dataTable id="employeeTable" var="employee" value="#{employeeBean.employees}"
+                                 rowKey="#{employee.id}" paginator="true" rows="10"
+                                 paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                                 rowsPerPageTemplate="5,10,15" emptyMessage="No employees found">
+                        
+                        <f:facet name="header">
+                            <p:commandButton value="Add New Employee" icon="pi pi-plus" 
+                                             actionListener="#{employeeBean.openAddDialog}"
+                                             update=":addEmployeeDialog" oncomplete="PF('addEmployeeWidget').show()"
+                                             styleClass="ui-button-success" />
+                        </f:facet>
+                        
+                        <p:column headerText="ID" sortBy="#{employee.id}" filterBy="#{employee.id}">
+                            <h:outputText value="#{employee.id}" />
+                        </p:column>
+                        
+                        <p:column headerText="First Name" sortBy="#{employee.firstName}" filterBy="#{employee.firstName}">
+                            <h:outputText value="#{employee.firstName}" />
+                        </p:column>
+                        
+                        <p:column headerText="Last Name" sortBy="#{employee.lastName}" filterBy="#{employee.lastName}">
+                            <h:outputText value="#{employee.lastName}" />
+                        </p:column>
+                        
+                        <p:column headerText="Email" sortBy="#{employee.email}" filterBy="#{employee.email}">
+                            <h:outputText value="#{employee.email}" />
+                        </p:column>
+                        
+                        <p:column headerText="Department" sortBy="#{employee.department}" filterBy="#{employee.department}">
+                            <h:outputText value="#{employee.department}" />
+                        </p:column>
+                        
+                        <p:column headerText="Salary" sortBy="#{employee.salary}">
+                            <h:outputText value="#{employee.salary}">
+                                <f:convertNumber type="currency" currencySymbol="KES" />
+                            </h:outputText>
+                        </p:column>
+                        
+                        <p:column headerText="Actions" styleClass="column-center">
+                            <p:commandButton icon="pi pi-pencil" title="Edit"
+                                             actionListener="#{employeeBean.openEditDialog(employee)}"
+                                             update=":editEmployeeDialog" oncomplete="PF('editEmployeeWidget').show()"
+                                             styleClass="ui-button-warning button-margin" />
+                            
+                            <p:commandButton icon="pi pi-trash" title="Delete"
+                                             actionListener="#{employeeBean.openDeleteDialog(employee)}"
+                                             update=":deleteEmployeeDialog" oncomplete="PF('deleteEmployeeWidget').show()"
+                                             styleClass="ui-button-danger" />
+                        </p:column>
+                    </p:dataTable>
+                </p:panel>
+                <p style="text-align: center; color: blue">Developed By: Samuel Ndegwa : Practical Assessment : Done on: Sunday 13-04-2025</p>
+            </h:form>
+        </div>
+        
+        <!-- Add Employee Dialog -->
+        <p:dialog id="addEmployeeDialog" header="Add New Employee" widgetVar="addEmployeeWidget" 
+                  modal="true" showEffect="fade" hideEffect="fade" resizable="false" 
+                  styleClass="dialog-width" closeOnEscape="true">
+            <h:form id="addEmployeeForm">
+                <p:panelGrid columns="2" layout="grid" styleClass="ui-fluid">
+                    <p:outputLabel for="firstName" value="First Name:" />
+                    <p:inputText id="firstName" value="#{employeeBean.newEmployee.firstName}" 
+                                 required="true" requiredMessage="First name is required" />
+                    
+                    <p:outputLabel for="lastName" value="Last Name:" />
+                    <p:inputText id="lastName" value="#{employeeBean.newEmployee.lastName}" 
+                                 required="true" requiredMessage="Last name is required" />
+                    
+                    <p:outputLabel for="email" value="Email:" />
+                    <p:inputText id="email" value="#{employeeBean.newEmployee.email}" 
+                                 required="true" requiredMessage="Email is required"
+                                 validator="#{employeeBean.validateEmail}" />
+                    
+                    <p:outputLabel for="department" value="Department:" />
+                    <p:inputText id="department" value="#{employeeBean.newEmployee.department}" />
+                    
+                    <p:outputLabel for="salary" value="Salary:" />
+                    <p:inputNumber id="salary" value="#{employeeBean.newEmployee.salary}" 
+                                   symbol="KES" symbolPosition="p" decimalSeparator="."
+                                   thousandSeparator="," minValue="0" />
+                </p:panelGrid>
+                
+                <div class="dialog-footer">
+                    <p:commandButton value="Save" icon="pi pi-check" 
+                                     actionListener="#{employeeBean.saveNewEmployee}"
+                                     update=":employeeForm:employeeTable :messages"
+                                     styleClass="ui-button-success"
+                                     oncomplete="if(!args.validationFailed) PF('addEmployeeWidget').hide()" />
+                    
+                    <p:commandButton value="Cancel" icon="pi pi-times" 
+                                     onclick="PF('addEmployeeWidget').hide()" type="button"
+                                     styleClass="ui-button-secondary" />
+                </div>
+            </h:form>
+        </p:dialog>
+        
+        <!-- Edit Employee Dialog -->
+        <p:dialog id="editEmployeeDialog" header="Edit Employee" widgetVar="editEmployeeWidget" 
+                  modal="true" showEffect="fade" hideEffect="fade" resizable="false" 
+                  styleClass="dialog-width" closeOnEscape="true" responsive="true">
+            <h:form id="editEmployeeForm">
+                <p:panelGrid columns="2" layout="grid" styleClass="ui-fluid ui-panelgrid-blank">
+                    <p:outputLabel for="id" value="ID:" />
+                    <p:inputText id="id" value="#{employeeBean.selectedEmployee.id}" readonly="true" />
+                    
+                    <p:outputLabel for="firstName" value="First Name:" />
+                    <p:inputText id="firstName" value="#{employeeBean.selectedEmployee.firstName}" 
+                                 required="true" requiredMessage="First name is required" />
+                    
+                    <p:outputLabel for="lastName" value="Last Name:" />
+                    <p:inputText id="lastName" value="#{employeeBean.selectedEmployee.lastName}" 
+                                 required="true" requiredMessage="Last name is required" />
+                    
+                    <p:outputLabel for="email" value="Email:" />
+                    <p:inputText id="email" value="#{employeeBean.selectedEmployee.email}" 
+                                 required="true" requiredMessage="Email is required"
+                                 validator="#{employeeBean.validateEmail}" />
+                    
+                    <p:outputLabel for="department" value="Department:" />
+                    <p:inputText id="department" value="#{employeeBean.selectedEmployee.department}" />
+                    
+                    <p:outputLabel for="salary" value="Salary:" />
+                    <p:inputNumber id="salary" value="#{employeeBean.selectedEmployee.salary}" 
+                                   symbol="KES" symbolPosition="p" decimalSeparator="." 
+                                   thousandSeparator="," minValue="0" />
+                                  
+                </p:panelGrid>
+                
+                <div class="dialog-footer">
+                        <p:commandButton value="Save" icon="pi pi-check" 
+                                         actionListener="#{employeeBean.saveEditedEmployee}"
+                                         update=":employeeForm:employeeTable :messages"
+                                         styleClass="ui-button-success"
+                                         oncomplete="if(!args.validationFailed) PF('editEmployeeWidget').hide()" />
+                    
+                        <p:commandButton value="Cancel" icon="pi pi-times" 
+                                         onclick="PF('editEmployeeWidget').hide()" 
+                                         styleClass="ui-button-secondary" />
+                </div>
+            </h:form>
+        </p:dialog>
+        
+        <!-- Delete Confirmation Dialog -->
+        <p:dialog id="deleteEmployeeDialog" header="Confirm Deletion" widgetVar="deleteEmployeeWidget"
+                  modal="true" showEffect="fade" hideEffect="fade" resizable="false"
+                  styleClass="dialog-width" closeOnEscape="true">
+            <h:form id="deleteEmployeeForm">
+                <div class="ui-fluid">
+                    <p style="margin-bottom: 20px;">
+                        <i class="pi pi-exclamation-triangle" style="margin-right: 8px; color: #ff9800;"></i>
+                        Are you sure you want to delete the employee: 
+                        <b>#{employeeBean.selectedEmployee.firstName} #{employeeBean.selectedEmployee.lastName}</b>?
+                        <br /><br />
+                        <span style="color: #f44336;">This action cannot be undone.</span>
+                    </p>
+                </div>
+                
+                <div class="dialog-footer">
+                    <p:commandButton value="Yes, Delete" icon="pi pi-trash"
+                                     actionListener="#{employeeBean.deleteEmployee}"
+                                     update=":employeeForm:employeeTable :messages"
+                                     oncomplete="PF('deleteEmployeeWidget').hide()" 
+                                     styleClass="ui-button-danger" />
+                    
+                    <p:commandButton value="Cancel" icon="pi pi-times"
+                                     onclick="PF('deleteEmployeeWidget').hide()" type="button"
+                                     styleClass="ui-button-secondary" />
+                </div>
+            </h:form>
+        </p:dialog>
+    </h:body>
+</html>
